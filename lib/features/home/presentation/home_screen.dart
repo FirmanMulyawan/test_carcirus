@@ -17,7 +17,7 @@ class HomeScreen extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppStyle.secondary,
       body: SafeArea(bottom: false, child: _body(context)),
     );
   }
@@ -30,43 +30,46 @@ class HomeScreen extends GetView<HomeController> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: AppStyle.secondary,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SvgPicture.asset(
-                        AppConst.logo,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Looking for a car rental?",
-                        style: AppStyle.bold(
-                            size: 20, textColor: AppStyle.whiteColor),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Book now and enjoy 10% off your first\nweek's rental!",
-                        style: AppStyle.medium(
-                            size: 16, textColor: AppStyle.whiteColor),
-                      ),
-                    ],
-                  )),
-              SizedBox(height: height * 0.16),
-              CardReason(),
-              CardRent(),
-              SizedBox(
-                height: 100,
-              ),
-            ],
+          Container(
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: AppStyle.secondary,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SvgPicture.asset(
+                          AppConst.logo,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Looking for a car rental?",
+                          style: AppStyle.bold(
+                              size: 20, textColor: AppStyle.whiteColor),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Book now and enjoy 10% off your first\nweek's rental!",
+                          style: AppStyle.medium(
+                              size: 16, textColor: AppStyle.whiteColor),
+                        ),
+                      ],
+                    )),
+                SizedBox(height: height * 0.16),
+                CardReason(),
+                CardRent(),
+                SizedBox(
+                  height: 100,
+                ),
+              ],
+            ),
           ),
           Positioned(
             top: height * 0.16,
@@ -126,121 +129,134 @@ class HomeScreen extends GetView<HomeController> {
           SizedBox(
             height: 16,
           ),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Get.bottomSheet(isScrollControlled: true, PopupPicCar());
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppStyle.primaryColor,
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+          GetBuilder<HomeController>(builder: (ctrl) {
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: ctrl.timeController.text.isNotEmpty &&
+                        ctrl.dateController.text.isNotEmpty
+                    ? () {
+                        Get.bottomSheet(
+                            isScrollControlled: true, PopupPicCar());
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppStyle.primaryColor,
+                  disabledBackgroundColor: AppStyle.primaryLight,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  "Select My Car",
+                  style: AppStyle.semiBold(
+                      size: 16, textColor: AppStyle.whiteColor),
                 ),
               ),
-              child: Text(
-                "Select My Car",
-                style:
-                    AppStyle.semiBold(size: 16, textColor: AppStyle.whiteColor),
-              ),
-            ),
-          ),
+            );
+          })
         ],
       ),
     );
   }
 
   Widget _pickUpDate() {
-    return TextField(
-      autocorrect: false,
-      onTapOutside: (PointerDownEvent event) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      onTap: () {
-        Get.bottomSheet(
-          isScrollControlled: true,
-          PopupDate(),
-        );
-      },
-      readOnly: true,
-      style: AppStyle.regular(),
-      decoration: InputDecoration(
-        hintText: 'Date...',
-        hintStyle: AppStyle.regular(
-          textColor: AppStyle.gray300,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 15,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6.0),
-          borderSide: BorderSide(
-            color: AppStyle.gray300,
-            width: 1,
+    return GetBuilder<HomeController>(builder: (ctrl) {
+      return TextField(
+        autocorrect: false,
+        controller: ctrl.dateController,
+        onTapOutside: (PointerDownEvent event) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        onTap: () {
+          Get.bottomSheet(
+            isScrollControlled: true,
+            PopupDate(),
+          );
+        },
+        readOnly: true,
+        style: AppStyle.regular(),
+        decoration: InputDecoration(
+          hintText: 'Date...',
+          hintStyle: AppStyle.regular(
+            textColor: AppStyle.gray300,
           ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6.0),
-          borderSide: BorderSide(
-            color: AppStyle.gray300,
-            width: 1,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 15,
           ),
-        ),
-        suffixIcon: Padding(
-          padding: EdgeInsets.only(left: 14, right: 14),
-          child: SvgPicture.asset(
-            AppConst.date,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6.0),
+            borderSide: BorderSide(
+              color: AppStyle.gray300,
+              width: 1,
+            ),
           ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6.0),
+            borderSide: BorderSide(
+              color: AppStyle.gray300,
+              width: 1,
+            ),
+          ),
+          suffixIcon: Padding(
+            padding: EdgeInsets.only(left: 14, right: 14),
+            child: SvgPicture.asset(
+              AppConst.date,
+            ),
+          ),
+          fillColor: AppStyle.whiteColor,
+          filled: true,
         ),
-        fillColor: AppStyle.whiteColor,
-        filled: true,
-      ),
-    );
+      );
+    });
   }
 
   Widget _pickUpTime() {
-    return TextField(
-      autocorrect: false,
-      onTapOutside: (PointerDownEvent event) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      onTap: () {
-        Get.bottomSheet(isScrollControlled: true, PopupTime());
-      },
-      readOnly: true,
-      style: AppStyle.regular(),
-      decoration: InputDecoration(
-        hintText: 'Time...',
-        hintStyle: AppStyle.regular(
-          textColor: AppStyle.gray300,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 15,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6.0),
-          borderSide: BorderSide(
-            color: AppStyle.gray300,
-            width: 1,
+    return GetBuilder<HomeController>(builder: (ctrl) {
+      return TextField(
+        autocorrect: false,
+        controller: ctrl.timeController,
+        onTapOutside: (PointerDownEvent event) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        onTap: () {
+          Get.bottomSheet(isScrollControlled: true, PopupTime());
+        },
+        readOnly: true,
+        style: AppStyle.regular(),
+        decoration: InputDecoration(
+          hintText: 'Time...',
+          hintStyle: AppStyle.regular(
+            textColor: AppStyle.gray300,
           ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6.0),
-          borderSide: BorderSide(
-            color: AppStyle.gray300,
-            width: 1,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 15,
           ),
-        ),
-        suffixIcon: Padding(
-          padding: EdgeInsets.only(left: 14, right: 14),
-          child: SvgPicture.asset(
-            AppConst.time,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6.0),
+            borderSide: BorderSide(
+              color: AppStyle.gray300,
+              width: 1,
+            ),
           ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6.0),
+            borderSide: BorderSide(
+              color: AppStyle.gray300,
+              width: 1,
+            ),
+          ),
+          suffixIcon: Padding(
+            padding: EdgeInsets.only(left: 14, right: 14),
+            child: SvgPicture.asset(
+              AppConst.time,
+            ),
+          ),
+          fillColor: AppStyle.whiteColor,
+          filled: true,
         ),
-        fillColor: AppStyle.whiteColor,
-        filled: true,
-      ),
-    );
+      );
+    });
   }
 }

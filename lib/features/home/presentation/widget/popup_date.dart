@@ -58,16 +58,20 @@ class PopupDate extends GetView<HomeController> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   InkWell(
+                    onTap: () => controller.previousMonth(),
                     child: SvgPicture.asset(
                       AppConst.arrowLeft,
                     ),
                   ),
-                  Text(
-                    "August 2024",
-                    style: AppStyle.semiBold(
-                        size: 15, textColor: AppStyle.baseBlack),
-                  ),
+                  Obx(() {
+                    return Text(
+                      controller.activeMonthYear.value,
+                      style: AppStyle.semiBold(
+                          size: 15, textColor: AppStyle.baseBlack),
+                    );
+                  }),
                   InkWell(
+                    onTap: () => controller.nextMonth(),
                     child: SvgPicture.asset(
                       AppConst.arrowRight,
                     ),
@@ -79,32 +83,79 @@ class PopupDate extends GetView<HomeController> {
               height: 8,
             ),
             SfDateRangePicker(
-              // view: DateRangePickerView.month,
-              monthViewSettings: const DateRangePickerMonthViewSettings(
+              enableMultiView: false,
+              enablePastDates: true,
+              endRangeSelectionColor: AppStyle.whiteSmoke,
+              rangeSelectionColor: AppStyle.whiteSmoke,
+              startRangeSelectionColor: AppStyle.whiteSmoke,
+              showActionButtons: false,
+              view: DateRangePickerView.month,
+              minDate: DateTime.now(),
+              controller: controller.pickerController,
+              monthViewSettings: DateRangePickerMonthViewSettings(
                 dayFormat: 'EEE',
+                showTrailingAndLeadingDates: true,
+                specialDates: [DateTime.now()],
+                viewHeaderStyle: DateRangePickerViewHeaderStyle(
+                  textStyle:
+                      AppStyle.medium(size: 13, textColor: AppStyle.blackDark),
+                ),
               ),
-              onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {},
-              selectionMode: DateRangePickerSelectionMode.single,
+              onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                final PickerDateRange range = args.value;
+                controller.selectedRange.value = range;
+              },
+              onViewChanged: (DateRangePickerViewChangedArgs args) =>
+                  controller.updateActiveMonthYear(args),
+              selectionMode: DateRangePickerSelectionMode.range,
               showTodayButton: false,
+              todayHighlightColor: AppStyle.primaryColor,
+              navigationMode: DateRangePickerNavigationMode.none,
+              headerHeight: 0,
+              monthCellStyle: DateRangePickerMonthCellStyle(
+                trailingDatesTextStyle:
+                    AppStyle.regular(size: 13, textColor: AppStyle.neutral300),
+                leadingDatesTextStyle:
+                    AppStyle.regular(size: 13, textColor: AppStyle.neutral300),
+                textStyle:
+                    AppStyle.regular(size: 13, textColor: AppStyle.blackDark),
+                specialDatesDecoration: BoxDecoration(
+                  color: AppStyle.primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                specialDatesTextStyle:
+                    AppStyle.regular(size: 13, textColor: AppStyle.whiteColor),
+              ),
+              // showNavigationArrow: false,
+              selectionTextStyle:
+                  AppStyle.regular(size: 13, textColor: AppStyle.blackDark),
             ),
             SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppStyle.primaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              height: 36,
+            ),
+            Obx(() {
+              return SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: controller.selectedRange.value == null
+                      ? null
+                      : () => controller.changeDate(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppStyle.primaryColor,
+                    disabledBackgroundColor: AppStyle.primaryLight,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    "Apply",
+                    style: AppStyle.semiBold(
+                        size: 16, textColor: AppStyle.whiteColor),
                   ),
                 ),
-                child: Text(
-                  "Apply",
-                  style: AppStyle.semiBold(
-                      size: 16, textColor: AppStyle.whiteColor),
-                ),
-              ),
-            ),
+              );
+            }),
           ],
         ));
   }

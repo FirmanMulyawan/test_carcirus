@@ -46,12 +46,31 @@ class PopupTime extends GetView<HomeController> {
             Container(
               height: 120,
               color: Colors.white,
-              child: CupertinoDatePicker(
-                mode: CupertinoDatePickerMode.time,
-                use24hFormat: false,
-                initialDateTime: DateTime.now(),
-                onDateTimeChanged: (DateTime newDateTime) {},
-              ),
+              child: Builder(builder: (context) {
+                if (controller.selectedTime.value == null) {
+                  controller.changeTime(DateTime.now());
+                }
+                return CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.time,
+                  selectionOverlayBuilder: (context,
+                      {required columnCount, required selectedIndex}) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border.symmetric(
+                          horizontal:
+                              BorderSide(color: AppStyle.gray800, width: 0.5),
+                        ),
+                        color: Colors.transparent,
+                      ),
+                    );
+                  },
+                  use24hFormat: false,
+                  initialDateTime: DateTime.now(),
+                  onDateTimeChanged: (DateTime newDateTime) {
+                    controller.changeTime(newDateTime);
+                  },
+                );
+              }),
             ),
             SizedBox(
               height: 24,
@@ -59,7 +78,7 @@ class PopupTime extends GetView<HomeController> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => controller.applyButton(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppStyle.primaryColor,
                   padding: const EdgeInsets.symmetric(vertical: 13),

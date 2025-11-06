@@ -4,8 +4,11 @@ class AppStyle {
   // ========== Colors ==========
   static Color primaryColor = const Color(0xff3DBC81);
   static Color primaryLight = const Color(0xffABE4C9);
+  static Color greenLight = const Color(0xffEBFFF6);
+
   static Color grey = const Color(0xffA6A6A6);
   static Color gray300 = const Color(0xffCBD5E1);
+  static Color gray800 = const Color(0xff8B8B8B);
   static Color lightGrey = const Color(0xffCCCBCB);
   static Color secondary = const Color(0xff0A307E);
   static Color whiteColor = Colors.white;
@@ -17,6 +20,8 @@ class AppStyle {
   static Color lightBlack = const Color(0xff3F3F3F);
   static Color textColor = const Color(0xff0F172A);
   static Color neutral = const Color(0xff898384);
+  static Color neutral300 = const Color(0xffB5B3B3);
+  static Color neutral800 = const Color(0xff433E3F);
 
   // =============================
   static Color greyDark = Color(0xff9E9E9E);

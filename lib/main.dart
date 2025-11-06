@@ -190,9 +190,9 @@ class _AppInitializerState extends State<AppInitializer> {
           // theme: AppTheme.themeLight,
           theme: AppStyle.themeData(context),
           translations: AppTranslation(),
-          locale: const Locale('en'),
-          fallbackLocale: const Locale('en'),
-          supportedLocales: const [Locale('en'), Locale('id')],
+          locale: const Locale('en', 'US'),
+          fallbackLocale: const Locale('en', 'US'),
+          supportedLocales: const [Locale('en', 'US'), Locale('id')],
           initialRoute: AppRoute.defaultRoute,
           unknownRoute: GetPage(
               name: AppRoute.notFound, page: () => const UnknownRoutePage()),

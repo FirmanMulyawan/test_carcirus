@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../config/app_style.dart';
 import '../widget/popup_button.dart';
@@ -91,6 +92,84 @@ class AlertModel {
       barrierDismissible: barrierDismissible ?? true,
       barrierColor: AppStyle.dialogBgColor,
     );
+    return result;
+  }
+
+  static Future<bool?> showAlertDefault({
+    required String title,
+    required String message,
+    required Widget button,
+    required String image,
+    bool? barrierDismissible,
+  }) async {
+    final result = await Get.dialog<bool>(
+        barrierDismissible: barrierDismissible ?? true,
+        barrierColor: AppStyle.dialogBgColor,
+        Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 16,
+                      ),
+                      Center(
+                        child: Container(
+                          height: 80,
+                          width: 80,
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppStyle.greenLight,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: Center(
+                              child: SizedBox(
+                                  height: 46,
+                                  width: 46,
+                                  child: SvgPicture.asset(image))),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      Container(
+                        clipBehavior: Clip.hardEdge,
+                        width: double.maxFinite,
+                        decoration: BoxDecoration(
+                          color: AppStyle.whiteColor,
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        child: Text(
+                          title,
+                          textAlign: TextAlign.center,
+                          style: AppStyle.semiBold(
+                            size: 18,
+                            textColor: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          message,
+                          textAlign: TextAlign.center,
+                          style: AppStyle.regular(
+                            textColor: AppStyle.neutral,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 24,
+                      ),
+                      button
+                    ]))));
     return result;
   }
 

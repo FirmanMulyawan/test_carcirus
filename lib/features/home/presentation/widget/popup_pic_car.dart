@@ -154,7 +154,6 @@ class PopupPicCar extends GetView<HomeController> {
                                       ],
                                     ),
                                   ),
-                                  // Text(listCar[index]['price'] ?? '-'),
                                 ],
                               )
                             ],
@@ -174,11 +173,8 @@ class PopupPicCar extends GetView<HomeController> {
                   margin:
                       const EdgeInsets.only(left: 16, right: 16, bottom: 40),
                   child: ElevatedButton(
-                    onPressed: isSelected == null
-                        ? null
-                        : () {
-                            Get.back();
-                          },
+                    onPressed:
+                        isSelected == null ? null : () => ctrl.isPickCar(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppStyle.primaryColor,
                       disabledBackgroundColor: AppStyle.primaryLight,

@@ -1,0 +1,228 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+
+import '../../../component/config/app_const.dart';
+import '../../../component/config/app_style.dart';
+import '../../../component/widget/card_news.dart';
+import 'search_controller.dart';
+
+class SearchScreen extends GetView<SearchEveythingController> {
+  const SearchScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(bottom: false, child: _body(context)),
+    );
+  }
+
+  Widget _body(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _searchBar(),
+          SizedBox(
+            height: 10,
+          ),
+          _categories(context),
+          SizedBox(
+            height: 10,
+          ),
+          Expanded(
+            child: _listSearch(),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _searchBar() {
+    return TextField(
+      autocorrect: false,
+      controller: controller.searchController,
+      onTapOutside: (PointerDownEvent event) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      onChanged: (value) {
+        controller.updateKeyword();
+      },
+      style: AppStyle.regular(
+        size: 20,
+      ),
+      decoration: InputDecoration(
+        hintText: 'Search...',
+        hintStyle: AppStyle.regular(
+          size: 20,
+          textColor: AppStyle.gray300,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: BorderSide(
+            color: AppStyle.gray300,
+            width: 1.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: BorderSide(
+            color: AppStyle.gray300,
+            width: 1.5,
+          ),
+        ),
+        prefixIconConstraints: BoxConstraints(
+            minHeight: 24, minWidth: 52, maxHeight: 24, maxWidth: 52),
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(left: 18, right: 10),
+          child: SvgPicture.asset(
+            AppConst.arrowLeft,
+            colorFilter: ColorFilter.mode(
+              AppStyle.black,
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
+        fillColor: AppStyle.whiteColor,
+        filled: true,
+      ),
+    );
+  }
+
+  Widget _categories(context) {
+    return GetBuilder<SearchEveythingController>(builder: (ctrl) {
+      return DropdownButtonHideUnderline(
+        child: DropdownButton2<String>(
+          isExpanded: true,
+          value: ctrl.selectedCategoryId.value.isEmpty
+              ? null
+              : ctrl.selectedCategoryId.value,
+          items: ctrl.categorys.map((category) {
+            return DropdownMenuItem<String>(
+              value: category.id,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
+                  category.categoryName,
+                  style:
+                      AppStyle.bold(textColor: AppStyle.whiteColor, size: 16),
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            ctrl.changeSelectedCategory(value!);
+          },
+          customButton: Container(
+            width: double.infinity,
+            height: 50,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
+            ),
+            decoration: BoxDecoration(
+              color: AppStyle.blue,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  ctrl.getCategoryName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Spacer(),
+                SvgPicture.asset(
+                  AppConst.close,
+                  // width: 7,
+                  // height: 10,
+                ),
+              ],
+            ),
+          ),
+          dropdownStyleData: DropdownStyleData(
+            maxHeight: 200,
+            width: MediaQuery.of(context).size.width - 40,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppStyle.blue,
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _listSearch() {
+    return Obx(() {
+      final isLoading = controller.isLoading.value;
+      final isLoadMore = controller.loadMoreLoading.value;
+      final hasMore = controller.hasMore.value;
+      final list = controller.article;
+
+      if (isLoading && list.isEmpty) {
+        return ListView.separated(
+          itemCount: 3,
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemBuilder: (_, __) => Skeletonizer(
+            enabled: true,
+            child: CardNews(isLoading: true, data: null),
+          ),
+        );
+      }
+
+      if (list.isEmpty) {
+        return const Center(
+          child: Text("Tidak ada berita ditemukan."),
+        );
+      }
+
+      return RefreshIndicator(
+        color: AppStyle.blue,
+        onRefresh: controller.onRefresh,
+        child: ListView.separated(
+            controller: controller.scrollController,
+            padding: EdgeInsets.zero,
+            physics: AlwaysScrollableScrollPhysics(),
+            separatorBuilder: (_, __) => const SizedBox(height: 16),
+            itemCount: list.length + 1,
+            itemBuilder: (context, index) {
+              if (index < list.length) {
+                final item = list[index];
+                return CardNews(isLoading: false, data: item);
+              } else {
+                if (isLoadMore) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppStyle.blue,
+                      ),
+                    ),
+                  );
+                } else if (!hasMore) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Text(
+                      "Semua berita sudah ditampilkan",
+                      textAlign: TextAlign.center,
+                      style: AppStyle.regular(
+                        size: 14,
+                        textColor: AppStyle.greyDark,
+                      ),
+                    ),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }
+            }),
+      );
+    });
+  }
+}

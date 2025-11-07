@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:notification_center/notification_center.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../../component/config/app_const.dart';
 import '../../../component/config/app_style.dart';
+import '../../../component/database/database_car.dart';
+import '../../../component/model/car_model.dart';
 import '../../../component/util/helper.dart';
 
 class HomeController extends GetxController {
-  int? selectedCar;
+  CarModel? selectedCar;
   final TextEditingController timeController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final Rxn<DateTime> selectedTime = Rxn<DateTime>();
@@ -17,6 +21,26 @@ class HomeController extends GetxController {
       DateRangePickerController();
   final activeMonthYear = ''.obs;
   final selectedRange = Rx<PickerDateRange?>(null);
+
+  DatabaseCarManager database = DatabaseCarManager.instance;
+
+  final List<CarModel> listCar = [
+    CarModel(
+        image: AppConst.nissanSentra,
+        type: 'Economic',
+        name: 'Nissan Sentra or similar',
+        price: '300'),
+    CarModel(
+        image: AppConst.toyotaPrius,
+        type: 'Hybrid',
+        name: 'toyota prius or similar',
+        price: '350'),
+    CarModel(
+        image: AppConst.nissanSentra2,
+        type: 'SUV',
+        name: 'Nissan Pathfinder or similar',
+        price: '400'),
+  ];
 
   HomeController();
 
@@ -29,7 +53,7 @@ class HomeController extends GetxController {
   // void onClose() {
   //   super.onClose();
   // }
-  void setSelectedCar(int value) {
+  void setSelectedCar(CarModel value) {
     selectedCar = value;
     update();
   }
@@ -102,7 +126,9 @@ class HomeController extends GetxController {
               ),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await addCar();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppStyle.primaryColor,
                     // padding: const EdgeInsets.symmetric(vertical: 13),
@@ -120,6 +146,13 @@ class HomeController extends GetxController {
             ],
           ),
         ));
+  }
+
+  Future<bool> hasData() async {
+    Database db = await database.db;
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM car');
+    int count = Sqflite.firstIntValue(result) ?? 0;
+    return count > 0;
   }
 
   void nextMonth() {
@@ -160,5 +193,26 @@ class HomeController extends GetxController {
       'December'
     ];
     return names[month];
+  }
+
+  Future<void> addCar() async {
+    Database db = await database.db;
+
+    await db.insert(
+      "car",
+      {
+        "id": 1,
+        "date": dateController.text,
+        "time": timeController.text,
+        "image": selectedCar?.image,
+        "type": selectedCar?.type,
+        "name": selectedCar?.name,
+        "price": selectedCar?.price,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    NotificationCenter().notify('refresh-my-car');
+    Get.back();
   }
 }

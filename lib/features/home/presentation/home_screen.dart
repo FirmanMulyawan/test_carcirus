@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../component/config/app_const.dart';
 import '../../../component/config/app_style.dart';
+import '../../../component/util/helper.dart';
 import 'home_controller.dart';
 import 'widget/card_reason.dart';
 import 'widget/card_rent.dart';
@@ -135,9 +136,45 @@ class HomeScreen extends GetView<HomeController> {
               child: ElevatedButton(
                 onPressed: ctrl.timeController.text.isNotEmpty &&
                         ctrl.dateController.text.isNotEmpty
-                    ? () {
-                        Get.bottomSheet(
-                            isScrollControlled: true, PopupPicCar());
+                    ? () async {
+                        bool hasData = await ctrl.hasData();
+                        if (hasData) {
+                          AlertModel.showAlertDefault(
+                              title: "You have book or active car rental",
+                              message:
+                                  "Please complete your current rental before booking a new one",
+                              image: AppConst.carCrash,
+                              button: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16, right: 16, bottom: 16),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () => Get.back(),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      // padding: const EdgeInsets.symmetric(vertical: 13),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: BorderSide(
+                                            color: AppStyle.lightGrey,
+                                            width: 1),
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    child: Text(
+                                      "Back",
+                                      style: AppStyle.semiBold(
+                                          size: 14,
+                                          textColor: AppStyle.neutral800),
+                                    ),
+                                  ),
+                                ),
+                              ));
+                        } else {
+                          Get.bottomSheet(
+                              isScrollControlled: true, PopupPicCar());
+                        }
                       }
                     : null,
                 style: ElevatedButton.styleFrom(

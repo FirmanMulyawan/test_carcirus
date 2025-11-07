@@ -11,27 +11,6 @@ class PopupPicCar extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final listCar = [
-      {
-        'image': AppConst.nissanSentra,
-        'type': 'Economic',
-        'name': 'Nissan Sentra or similar',
-        'price': '300'
-      },
-      {
-        'image': AppConst.toyotaPrius,
-        'type': 'Hybrid',
-        'name': 'toyota prius or similar',
-        'price': '350'
-      },
-      {
-        'image': AppConst.nissanSentra2,
-        'type': 'SUV',
-        'name': 'Nissan Pathfinder or similar',
-        'price': '400'
-      },
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -81,12 +60,13 @@ class PopupPicCar extends GetView<HomeController> {
                   return ListView.separated(
                     padding: const EdgeInsets.only(
                         top: 16, left: 16, right: 16, bottom: 200),
-                    itemCount: listCar.length,
+                    itemCount: ctrl.listCar.length,
                     itemBuilder: (context, index) {
                       final isSelected = ctrl.selectedCar;
+                      final listCar = ctrl.listCar;
 
                       return InkWell(
-                        onTap: () => ctrl.setSelectedCar(index),
+                        onTap: () => ctrl.setSelectedCar(listCar[index]),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(
@@ -95,7 +75,7 @@ class PopupPicCar extends GetView<HomeController> {
                             color: AppStyle.whiteColor,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: isSelected == index
+                              color: isSelected?.name == listCar[index].name
                                   ? AppStyle.primaryColor
                                   : AppStyle.lightGrey,
                               width: 1,
@@ -103,7 +83,7 @@ class PopupPicCar extends GetView<HomeController> {
                           ),
                           child: Column(
                             children: [
-                              Image.asset(listCar[index]['image']!),
+                              Image.asset(listCar[index].image),
                               SizedBox(
                                 height: 16,
                               ),
@@ -117,14 +97,14 @@ class PopupPicCar extends GetView<HomeController> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        listCar[index]['type'] ?? '-',
+                                        listCar[index].type,
                                         style: AppStyle.semiBold(
                                             size: 18, textColor: Colors.black),
                                       ),
                                       SizedBox(
                                         height: 4,
                                       ),
-                                      Text(listCar[index]['name'] ?? '-',
+                                      Text(listCar[index].name,
                                           style: AppStyle.regular(
                                             size: 14,
                                             textColor: Colors.black
@@ -138,8 +118,7 @@ class PopupPicCar extends GetView<HomeController> {
                                           size: 20, textColor: Colors.black),
                                       children: [
                                         TextSpan(
-                                            text:
-                                                "\$ ${listCar[index]['price'] ?? '-'}",
+                                            text: "\$ ${listCar[index].price}",
                                             style: AppStyle.semiBold(
                                                 size: 20,
                                                 textColor:
